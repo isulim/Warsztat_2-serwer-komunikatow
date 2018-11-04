@@ -66,6 +66,23 @@ class User:
             return None
 
     @classmethod
+    def load_user_by_email(cls, cursor, email):
+        sql = """SELECT id, username, email, hashed_password
+                     FROM users WHERE email=%s"""
+
+        cursor.execute(sql, (email,))  # (user_id, ) - bo tworzymy krotkę
+        data = cursor.fetchone()
+        if data:
+            loaded_user = cls()
+            loaded_user.__id = data[0]
+            loaded_user.username = data[1]
+            loaded_user.email = data[2]
+            loaded_user.__hashed_password = data[3]
+            return loaded_user
+        else:
+            return None
+
+    @classmethod
     def load_all_users(cls, cursor):
         sql = "SELECT id, username, email, hashed_password FROM Users"
         ret = []
@@ -81,3 +98,20 @@ class User:
 
     def __str__(self):
         return "User ({}, {}, {}, {}".format(self.id, self.username, self.email, self.hashed_password)
+
+    @classmethod
+    def load_user_by_username(cls, cursor, username):
+        sql = """SELECT id, username, email, hashed_password
+                             FROM users WHERE username=%s"""
+
+        cursor.execute(sql, (username,))  # (user_id, ) - bo tworzymy krotkę
+        data = cursor.fetchone()
+        if data:
+            loaded_user = cls()
+            loaded_user.__id = data[0]
+            loaded_user.username = data[1]
+            loaded_user.email = data[2]
+            loaded_user.__hashed_password = data[3]
+            return loaded_user
+        else:
+            return None
