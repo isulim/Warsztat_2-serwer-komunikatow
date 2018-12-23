@@ -154,12 +154,33 @@ class Message:
             return None
 
     @classmethod
-    def load_all_messages_for_user(cls, cursor, user_id):
+    def load_all_messages_for_user_by_id(cls, cursor, user_id):
         sql = """SELECT id, from_id, to_id, text, creation_date
                                  FROM messages WHERE to_id=%s"""
         ret = []
         cursor.execute(sql, (user_id,))
 
+        for row in cursor.fetchall():
+            loaded_message = cls()
+            loaded_message.__id = row[0]
+            loaded_message.from_id = row[1]
+            loaded_message.to_id = row[2]
+            loaded_message.text = row[3]
+            loaded_message.creation_date = row[4]
+            ret.append(loaded_message)
+        return ret
+
+    @classmethod
+    def load_all_messages_for_user_by_username(cls, cursor, username):
+        sql_1 = """SELECT id FROM users WHERE username=%s"""
+        sql_2 = """SELECT id, from_id, to_id, text, creation_date
+                                     FROM messages WHERE to_id=%s
+                                     ORDER BY creation_date asc;"""
+        ret = []
+        cursor.execute(sql_1, (username,))
+        id = cursor.fetchone()[0]
+
+        cursor.execute(sql_2, (id,))
         for row in cursor.fetchall():
             loaded_message = cls()
             loaded_message.__id = row[0]
