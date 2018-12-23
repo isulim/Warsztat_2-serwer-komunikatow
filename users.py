@@ -31,6 +31,8 @@ if conn:
         nowy.save_to_db(cursor)
         conn.commit()
         print("Dodano użytkownika {}".format(args.username))
+    else:
+        print("Nie dodano użytkownika. Sprawdź parametry.")
 
     # Zmiana hasła
     if args.username and args.password and args.edit and args.new_pass:
