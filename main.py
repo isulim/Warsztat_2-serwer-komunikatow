@@ -1,5 +1,6 @@
-from models import User
+from models import User, Message
 from psycopg2 import connect, OperationalError
+from datetime import datetime
 
 
 def get_connection(base='warsztat2'):
@@ -29,25 +30,41 @@ if __name__ == '__main__':
         # print(u.id)
         # conn.commit()
         #
-        u2 = User.load_user_by_id(cursor, 4)
-        u2.set_hashed_password('siemaneczko')
-        u2.email = 'andrzej4@andrzej.pl'
-        u2.username = 'andrzej4arcymiszcz'
-        u2.save_to_db(cursor)
-        print(u2.hashed_password)
-        print(u2.id)
-        conn.commit()
+        # u2 = User.load_user_by_id(cursor, 4)
+        # u2.set_hashed_password('siemaneczko')
+        # u2.email = 'andrzej4@andrzej.pl'
+        # u2.username = 'andrzej4arcymiszcz'
+        # u2.save_to_db(cursor)
+        # print(u2.hashed_password)
+        # print(u2.id)
+        # conn.commit()
+        #
+        # u3 = User.load_user_by_id(cursor, 4)
+        # print(u3)
+        #
+        # u3.delete(cursor)
+        # conn.commit()
+        # print(u3.id)
 
-        u3 = User.load_user_by_id(cursor, 4)
-        print(u3)
+        # ua = User.load_all_users(cursor)
+        # for user in ua:
+        #     print(user)
 
-        u3.delete(cursor)
-        conn.commit()
-        print(u3.id)
+        # m = Message()
+        # m.from_id = 9
+        # m.to_id = 7
+        # m.text = 'Cześć Riczard)'
+        # m.creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # m.save_to_db(cursor)
+        # m4 = Message.load_message_by_id(cursor, 4)
+        # print(m4)
+        # m4.delete(cursor)
 
-        ua = User.load_all_users(cursor)
-        for user in ua:
-            print(user)
+        # conn.commit()
+
+        m = Message.load_all_messages_for_user(cursor, 7)
+        for message in m:
+            print(message)
 
         cursor.close()
         conn.close()
