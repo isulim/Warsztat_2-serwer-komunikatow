@@ -209,6 +209,15 @@ class Message:
 
         return ret
 
+    @classmethod
+    def get_user_id_by_username(cls, cursor, username):
+        sql = """SELECT id FROM users WHERE username=%s"""
+
+        cursor.execute(sql, (username,))
+        user_id = cursor.fetchone()
+
+        return user_id
+
     def save_to_db(self, cursor):
         if self.__id == -1:
             # zapisywanie nowej wiadomości

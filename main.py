@@ -52,19 +52,16 @@ if __name__ == '__main__':
 
         # m = Message()
         # m.from_id = 9
-        # m.to_id = 7
-        # m.text = 'Cześć Riczard)'
+        # m.to_id = 10
+        # m.text = 'Cześć qwery'
         # m.creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # m.save_to_db(cursor)
-        # m4 = Message.load_message_by_id(cursor, 4)
-        # print(m4)
-        # m4.delete(cursor)
-
+        #
         # conn.commit()
 
-        m = Message.load_all_messages_for_user(cursor, 7)
-        for message in m:
-            print(message)
+        # m = Message.load_all_messages_for_user_by_username(cursor, 'adrian')
+        # for message in m:
+        #     print(message)
 
         cursor.close()
         conn.close()
