@@ -8,11 +8,10 @@ parser.add_argument("-u", "--username", help='Nazwa użytkownika')
 parser.add_argument("-m", "--mail", help='Adres e-mail')
 parser.add_argument("-p", "--password", help='Hasło użytkownika')
 parser.add_argument("-n", "--new-pass", help='Nowe hasło użytkownika')
-parser.add_argument("-l", "--list", help='Lista użytkowników')
+parser.add_argument("-l", "--list", action='store_true', help='Lista użytkowników')
 parser.add_argument("-d", "--delete", help='Login użytkownika do usunięcia')
 parser.add_argument("-e", "--edit", action='store_true', help='Login użytkownika do edycji')
 args = parser.parse_args()
-
 
 conn = get_connection()
 
@@ -53,6 +52,12 @@ if conn:
             print("Użytkownik usunięty")
         else:
             print("Nie udało się")
+
+    # Lista użytkowników
+    if args.list:
+        u = User.load_all_users(cursor)
+        for user in u:
+            print(user)
 
     cursor.close()
     conn.close()

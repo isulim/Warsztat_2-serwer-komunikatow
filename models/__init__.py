@@ -97,7 +97,7 @@ class User:
         return ret
 
     def __str__(self):
-        return "User ({}, {}, {}, {}".format(self.id, self.username, self.email, self.hashed_password)
+        return "User ({}, {}, {})".format(self.id, self.username, self.email)
 
     @classmethod
     def load_user_by_username(cls, cursor, username):
