@@ -63,3 +63,6 @@ if conn:
 
     cursor.close()
     conn.close()
+
+else:
+    print("Błąd połączenia z bazą.")

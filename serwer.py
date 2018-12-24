@@ -11,10 +11,9 @@ parser.add_argument("-u", "--username", help="Login użytkownika")
 parser.add_argument("-p", "--password", help="Hasło")
 parser.add_argument("-l", "--list", action="store_true", help="Lista wszystkich twoich komunikatów")
 parser.add_argument("-t", "--to", help="Mail odbiorcy")
-parser.add_argument("-s", "--send", action="store_false", help="Treść komunikatu do wysłania")
+parser.add_argument("-s", "--send", help="Treść komunikatu do wysłania")
 
 args = parser.parse_args()
-
 
 conn = get_connection()
 
@@ -31,20 +30,24 @@ if conn:
                     print(message.creation_date, message.from_id, message.text)
             else:
                 raise Exception("Błąd użytkownika lub hasła.")
+        else:
+            raise Exception("Podaj login i hasło.")
 
     # Nadawanie komunikatu
     elif args.send:
         if args.username and args.password:
             if args.to:
-                if User.load_user_by_id(cursor, args.to):
+                to_id = Message.get_user_id_by_username(cursor, args.to)
+                if User.load_user_by_id(cursor, to_id):
                     from_id = Message.get_user_id_by_username(cursor, args.username)
                     m = Message()
                     m.from_id = from_id
-                    m.to_id = args.to
+                    m.to_id = to_id
                     m.text = args.send
                     m.creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     m.save_to_db(cursor)
                     conn.commit()
+                    print("Wysłano komunikat.")
                 else:
                     raise Exception("Nie ma takiego użytkownika!")
             else:
@@ -54,7 +57,8 @@ if conn:
     else:
         raise Exception("Nie podano komunikatu!")
 
-
-
     cursor.close()
     conn.close()
+
+else:
+    print("Błąd połączenia z bazą.")
