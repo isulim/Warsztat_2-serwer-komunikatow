@@ -1,5 +1,5 @@
 from clcrypto import password_hash
-from wtforms import Form, BooleanField, StringField, PasswordField, validators
+from wtforms import Form, BooleanField, StringField, IntegerField, PasswordField, validators
 
 class User:
     __id = None
@@ -84,7 +84,7 @@ class User:
 
     @classmethod
     def load_all_users(cls, cursor):
-        sql = "SELECT id, username, email, hashed_password FROM Users"
+        sql = "SELECT id, username, email, hashed_password FROM Users ORDER BY id"
         ret = []
         cursor.execute(sql)
         for row in cursor.fetchall():
@@ -116,6 +116,7 @@ class User:
         else:
             return None
 
+    
 
 class Message:
     __id = None
@@ -130,6 +131,8 @@ class Message:
         self.to_id = 0
         self.text = ''
         self.creation_date = 0
+
+    
 
     @property
     def id(self):
@@ -230,14 +233,21 @@ class Message:
 
         return ret
 
-    @classmethod
-    def get_user_id_by_username(cls, cursor, username):
+    @staticmethod
+    def get_user_id_by_username(cursor, username):
         sql = """SELECT id FROM users WHERE username=%s"""
 
         cursor.execute(sql, (username,))
         user_id = cursor.fetchone()
 
         return user_id
+
+    @staticmethod
+    def get_username(cursor, id):
+        sql = """SELECT username FROM users WHERE id=%s"""
+        cursor.execute(sql, (id,))
+        username = cursor.fetchone()
+        return username    
 
     def save_to_db(self, cursor):
         if self.__id == -1:
@@ -271,4 +281,9 @@ class NewUserForm(Form):
         validators.EqualTo('confirm', message='Hasła muszą się zgadzać')
     ])
     confirm = PasswordField('Repeat Password')
-    
+
+
+class SendForm(Form):
+    reciever = StringField("Reciever's name", [validators.DataRequired()])
+    message = StringField("Message", [validators.DataRequired()])
+    password = PasswordField("Your password", [validators.DataRequired()])

@@ -1,4 +1,4 @@
-from models import User, Message, NewUserForm
+from models import User, Message, NewUserForm, SendForm
 from clcrypto import password_hash, check_password
 from psycopg2 import connect, OperationalError
 from datetime import datetime
@@ -58,6 +58,31 @@ def newUser():
         flash('Dodano użytkownika')
         return redirect(url_for('users'))
     return render_template('new_user.html', form=form)
+
+@app.route('/send/<int:userID>', methods=['GET', 'POST'])
+def send(userID):
+    form = SendForm(request.form)
+    if request.method == 'POST' and form.validate():
+        conn = get_connection()
+        if conn:
+            cursor = conn.cursor()
+            sender = User.load_user_by_id(cursor, userID)
+            reciever_id = Message.get_user_id_by_username(cursor, form.reciever.data)
+
+            if check_password(form.password.data, sender.hashed_password):
+                message = Message()
+                message.to_id = reciever_id
+                message.from_id = userID
+                message.text = form.message.data
+                message.creation_date = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+                message.save_to_db(cursor)
+                conn.commit()
+            else:
+                flash("Błąd hasła!")
+            cursor.close()
+            conn.close()
+            return redirect('/user/{}'.format(reciever_id[0]))
+    return render_template('send_message.html', form=form)
 
 @app.route('/user/<int:userID>', methods=['GET', 'POST'])
 def userMessages(userID):

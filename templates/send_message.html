@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block content %}
+    
+    <form method='post'>
+        <dl>
+            {{ render_field(form.reciever) }}
+            {{ render_field(form.message) }}
+            {{ render_field(form.password) }}
+        </dl>
+        <p><input type=submit value=Wyślij>
+    </form>
+{% endblock content %}  
