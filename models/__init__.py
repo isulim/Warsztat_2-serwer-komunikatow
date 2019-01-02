@@ -1,5 +1,5 @@
 from clcrypto import password_hash
-
+from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
 class User:
     __id = None
@@ -25,7 +25,7 @@ class User:
         self.__hashed_password = password_hash(password, salt)
 
     def save_to_db(self, cursor):
-        if self.__id == -1:
+        if self.__id == -1: 
             # zapisywanie nowej instancji
             sql = """INSERT INTO Users(username, email, hashed_password)
             VALUES(%s, %s, %s) RETURNING id"""
@@ -261,3 +261,14 @@ class Message:
                                                      self.to_id,
                                                      self.text,
                                                      self.creation_date)
+
+
+class NewUserForm(Form):
+    username = StringField('Username', [validators.DataRequired()])
+    email = StringField('Email', [validators.DataRequired()])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Hasła muszą się zgadzać')
+    ])
+    confirm = PasswordField('Repeat Password')
+    

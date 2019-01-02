@@ -1,7 +1,9 @@
-from models import User, Message
+from models import User, Message, NewUserForm
+from clcrypto import password_hash, check_password
 from psycopg2 import connect, OperationalError
 from datetime import datetime
-from flask import Flask, request, render_template, abort
+from flask import Flask, request, render_template, abort, flash, redirect, url_for
+
 
 
 def get_connection(base='warsztat2'):
@@ -17,6 +19,7 @@ def get_connection(base='warsztat2'):
 
 
 app = Flask(__name__)
+app.secret_key = 'something'
 
 @app.route('/', methods=['GET', 'POST'])
 def users():
@@ -34,6 +37,27 @@ def users():
     else:
         return abort(403)
 
+@app.route('/new-user', methods=['GET', 'POST'])
+def newUser():
+    form = NewUserForm(request.form)
+    if request.method == 'POST' and form.validate():
+        conn = get_connection()
+        if conn:
+            cursor = conn.cursor()
+            user = User()
+            user.username = form.username.data
+            user.email = form.email.data
+            user.set_hashed_password(form.password.data)
+            user.save_to_db(cursor)
+            conn.commit()
+            cursor.close()
+            conn.close()
+        else:
+            flash('Błąd połączenia z bazą.')
+
+        flash('Dodano użytkownika')
+        return redirect(url_for('users'))
+    return render_template('new_user.html', form=form)
 
 @app.route('/user/<int:userID>', methods=['GET', 'POST'])
 def userMessages(userID):
@@ -49,7 +73,8 @@ def userMessages(userID):
             users = "Błąd połączenia z bazą."
         return render_template('user_messages.html', messages=messages)
     else:
-        pass
+        flash("Niedozwolona metoda")
+        return redirect(url_for('users'))
 
 
 if __name__ == '__main__':

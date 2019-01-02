@@ -1,40 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <table>
-            <tr>
-                <th>Nr</th>
-                <th>Data</th>
-                <th>Nadawca</th>
-                <th>Treść</th>
+    <div style="float: left;">
+        <table>
+                <tr>
+                    <th>Nr</th>
+                    <th>Data</th>
+                    <th>Nadawca</th>
+                    <th>Treść</th>
+                    
+                </tr>
+            
+                {% for message in messages %}
+                <tr>
+                    <td>{{ message.id }}</td>
+                    <td>{{ message.creation_date }}</td>
+                    <td>{{ message.from_id }}</td>
+                    <td>{{ message.text }}</td>
+                </tr>
+                {% endfor %}
                 
-            </tr>
-        
-            {% for message in messages %}
-            <tr>
-                <td>{{ message.id }}</td>
-                <td>{{ message.creation_date }}</td>
-                <td>{{ message.from_id }}</td>
-                <td>{{ message.text }}</td>
-            </tr>
-            {% endfor %}
-            
-    </table>
-    
-{% endblock content %}  <table>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>E-mail</th>
-            </tr>
-        
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td><a href="/user/{{ user.id }}">{{ user.username }}</a></td>
-                <td>{{ user.email }}</td>
-            </tr>
-            {% endfor %}
-            
-    </table>
+        </table>
+    </div>
+
+    <div style="float: right;">
+        <form>
+        </form>
+    </div>
+{% endblock content %}
     
