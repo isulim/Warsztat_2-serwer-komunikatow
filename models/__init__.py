@@ -153,10 +153,31 @@ class Message:
         else:
             return None
 
+
+    @classmethod
+    def load_messages_with_usernames(cls, cursor, user_id):
+        sql = """SELECT messages.id, users.username, messages.text, messages.creation_date
+                FROM messages JOIN users ON messages.from_id = users.id
+                WHERE messages.to_id=%s
+                ORDER BY creation_date DESC;"""
+        ret = []
+
+        cursor.execute(sql, (user_id,))
+
+        for row in cursor.fetchall():
+            loaded_message = cls()
+            loaded_message.__id = row[0]
+            loaded_message.from_id = row[1]
+            loaded_message.text = row[2]
+            loaded_message.creation_date = row[3]
+            ret.append(loaded_message)
+        return ret
+
+
     @classmethod
     def load_all_messages_for_user_by_id(cls, cursor, user_id):
         sql = """SELECT id, from_id, to_id, text, creation_date
-                                 FROM messages WHERE to_id=%s"""
+                    FROM messages WHERE to_id=%s ORDER BY creation_date DESC;"""
         ret = []
         cursor.execute(sql, (user_id,))
 

@@ -1,6 +1,7 @@
 from models import User, Message
 from psycopg2 import connect, OperationalError
 from datetime import datetime
+from flask import Flask, request, render_template
 
 
 def get_connection(base='warsztat2'):
@@ -15,55 +16,42 @@ def get_connection(base='warsztat2'):
         return None
 
 
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def users():
+
+    if request.method == 'GET':
+        conn = get_connection()
+        if conn:
+            cursor = conn.cursor()
+            users = User.load_all_users(cursor)
+            cursor.close()
+            conn.close()
+        else:
+            users = "Błąd połączenia z bazą."
+        return render_template('users.html', users=users)
+    else:
+        pass
+
+
+@app.route('/user/<int:userID>', methods=['GET', 'POST'])
+def userMessages(userID):
+
+    if request.method == 'GET':
+        conn = get_connection()
+        if conn:
+            cursor = conn.cursor()
+            messages = Message.load_messages_with_usernames(cursor, userID)
+            cursor.close()
+            conn.close()
+        else:
+            users = "Błąd połączenia z bazą."
+        return render_template('user_messages.html', messages=messages)
+    else:
+        pass
+
+
 if __name__ == '__main__':
 
-    conn = get_connection()
-    if conn:
-        cursor = conn.cursor()
-
-        # u = User()
-        # u.set_hashed_password('siemanko')
-        # u.email = 'andrzej@andrzej.pl'
-        # u.username = 'andrzejmiszcz'
-        # u.save_to_db(cursor)
-        # print(u.hashed_password)
-        # print(u.id)
-        # conn.commit()
-        #
-        # u2 = User.load_user_by_id(cursor, 4)
-        # u2.set_hashed_password('siemaneczko')
-        # u2.email = 'andrzej4@andrzej.pl'
-        # u2.username = 'andrzej4arcymiszcz'
-        # u2.save_to_db(cursor)
-        # print(u2.hashed_password)
-        # print(u2.id)
-        # conn.commit()
-        #
-        # u3 = User.load_user_by_id(cursor, 4)
-        # print(u3)
-        #
-        # u3.delete(cursor)
-        # conn.commit()
-        # print(u3.id)
-
-        # ua = User.load_all_users(cursor)
-        # for user in ua:
-        #     print(user)
-
-        # m = Message()
-        # m.from_id = 9
-        # m.to_id = 10
-        # m.text = 'Cześć qwery'
-        # m.creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # m.save_to_db(cursor)
-        #
-        # conn.commit()
-
-        # m = Message.load_all_messages_for_user_by_username(cursor, 'adrian')
-        # for message in m:
-        #     print(message)
-
-        cursor.close()
-        conn.close()
-    else:
-        print('Nie udało się połączyć')
+    app.run(debug=True)
