@@ -1,7 +1,7 @@
 from models import User, Message
 from psycopg2 import connect, OperationalError
 from datetime import datetime
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, abort
 
 
 def get_connection(base='warsztat2'):
@@ -32,7 +32,7 @@ def users():
             users = "Błąd połączenia z bazą."
         return render_template('users.html', users=users)
     else:
-        pass
+        return abort(403)
 
 
 @app.route('/user/<int:userID>', methods=['GET', 'POST'])
