@@ -1,6 +1,7 @@
 from clcrypto import password_hash
 from wtforms import Form, BooleanField, StringField, IntegerField, PasswordField, validators
 
+
 class User:
     __id = None
     username = None
@@ -116,7 +117,6 @@ class User:
         else:
             return None
 
-    
 
 class Message:
     __id = None
@@ -156,9 +156,8 @@ class Message:
         else:
             return None
 
-
     @classmethod
-    def load_messages_with_usernames(cls, cursor, user_id):
+    def rec_messages_with_usernames(cls, cursor, user_id):
         sql = """SELECT messages.id, users.username, messages.text, messages.creation_date
                 FROM messages JOIN users ON messages.from_id = users.id
                 WHERE messages.to_id=%s
@@ -176,6 +175,24 @@ class Message:
             ret.append(loaded_message)
         return ret
 
+    @classmethod
+    def sent_messages_with_usernames(cls, cursor, user_id):
+        sql = """SELECT messages.id, users.username, messages.text, messages.creation_date
+                    FROM messages JOIN users ON messages.to_id = users.id
+                    WHERE messages.from_id=%s
+                    ORDER BY creation_date DESC;"""
+        ret = []
+
+        cursor.execute(sql, (user_id,))
+
+        for row in cursor.fetchall():
+            loaded_message = cls()
+            loaded_message.__id = row[0]
+            loaded_message.to_id = row[1]
+            loaded_message.text = row[2]
+            loaded_message.creation_date = row[3]
+            ret.append(loaded_message)
+        return ret
 
     @classmethod
     def load_all_messages_for_user_by_id(cls, cursor, user_id):
@@ -247,6 +264,7 @@ class Message:
         sql = """SELECT username FROM users WHERE id=%s"""
         cursor.execute(sql, (id,))
         username = cursor.fetchone()
+        username = username[0]
         return username    
 
     def save_to_db(self, cursor):
@@ -274,16 +292,16 @@ class Message:
 
 
 class NewUserForm(Form):
-    username = StringField('Username', [validators.DataRequired()])
+    username = StringField('Nazwa użytkownika', [validators.DataRequired()])
     email = StringField('Email', [validators.DataRequired()])
-    password = PasswordField('Password', [
+    password = PasswordField('Hasło', [
         validators.DataRequired(),
         validators.EqualTo('confirm', message='Hasła muszą się zgadzać')
     ])
-    confirm = PasswordField('Repeat Password')
+    confirm = PasswordField('Powtórz hasło')
 
 
 class SendForm(Form):
-    reciever = StringField("Reciever's name", [validators.DataRequired()])
-    message = StringField("Message", [validators.DataRequired()])
-    password = PasswordField("Your password", [validators.DataRequired()])
+    reciever = StringField("Adresat", [validators.DataRequired()])
+    message = StringField("Wiadomość", [validators.DataRequired()])
+    password = PasswordField("Twoje hasło", [validators.DataRequired()])

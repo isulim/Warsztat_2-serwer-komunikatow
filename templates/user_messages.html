@@ -1,34 +1,60 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div style="float: left;">
+
+    <div style="text-align: left; margin: 20px;">
+        <h3>Wiadomości użytkownika {{ username }}</h3>
+    </div>
+
+    <div style="float: left; margin: 10px;">
         <caption>
-        Skrzynka odbiorcza
+        Otrzymane
         </caption>
         <table>
                 <tr>
                     <th>Nr</th>
-                    <th>Data</th>
                     <th>Nadawca</th>
                     <th>Treść</th>
-                    
+                    <th>Data</th>
+
                 </tr>
             
-                {% for message in messages %}
+                {% for message in rec_messages %}
                 <tr>
                     <td>{{ message.id }}</td>
-                    <td>{{ message.creation_date }}</td>
                     <td>{{ message.from_id }}</td>
                     <td>{{ message.text }}</td>
+                    <td>{{ message.creation_date }}</td>
                 </tr>
                 {% endfor %}
                 
         </table>
     </div>
+    <div style="float: left; margin: 10px;">
+        <caption>
+        Wysłane
+        </caption>
+        <table>
+                <tr>
+                    <th>Nr</th>
+                    <th>Odbiorca</th>
+                    <th>Treść</th>
+                    <th>Data</th>
 
-    <div style="float: right;">
-        <form>
-        </form>
+                </tr>
+
+                {% for message in sent_messages %}
+                <tr>
+                    <td>{{ message.id }}</td>
+                    <td>{{ message.to_id }}</td>
+                    <td>{{ message.text }}</td>
+                    <td>{{ message.creation_date }}</td>
+                </tr>
+                {% endfor %}
+
+        </table>
     </div>
+
+
 {% endblock content %}
     
