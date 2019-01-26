@@ -5,9 +5,12 @@
     
     <form method='post'>
         <dl>
-            {{ render_field(form.reciever) }}
-            {{ render_field(form.message) }}
+            {{ form.csrf_token }}
+            {{ render_field(form.sender) }}
             {{ render_field(form.password) }}
+            {{ render_field(form.receiver) }}
+            {{ render_field(form.message) }}
+
         </dl>
         <p><input type=submit value=Wyślij>
     </form>

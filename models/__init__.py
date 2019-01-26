@@ -1,5 +1,6 @@
 from clcrypto import password_hash
-from wtforms import Form, BooleanField, StringField, IntegerField, PasswordField, validators
+from wtforms import StringField, PasswordField, validators, SelectField
+from flask_wtf import FlaskForm
 
 
 class User:
@@ -94,6 +95,18 @@ class User:
             loaded_user.username = row[1]
             loaded_user.email = row[2]
             loaded_user.__hashed_password = row[3]
+            ret.append(loaded_user)
+        return ret
+
+    @classmethod
+    def load_users_list(cls, cursor):
+        sql = "SELECT id, username FROM Users ORDER BY id"
+        ret = []
+        cursor.execute(sql)
+        for row in cursor.fetchall():
+            loaded_user = cls()
+            loaded_user.__id = row[0]
+            loaded_user.username = row[1]
             ret.append(loaded_user)
         return ret
 
@@ -291,17 +304,4 @@ class Message:
                                                      self.creation_date)
 
 
-class NewUserForm(Form):
-    username = StringField('Nazwa użytkownika', [validators.DataRequired()])
-    email = StringField('Email', [validators.DataRequired()])
-    password = PasswordField('Hasło', [
-        validators.DataRequired(),
-        validators.EqualTo('confirm', message='Hasła muszą się zgadzać')
-    ])
-    confirm = PasswordField('Powtórz hasło')
 
-
-class SendForm(Form):
-    reciever = StringField("Adresat", [validators.DataRequired()])
-    message = StringField("Wiadomość", [validators.DataRequired()])
-    password = PasswordField("Twoje hasło", [validators.DataRequired()])
